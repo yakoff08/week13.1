@@ -5,10 +5,15 @@ import bodyParser from 'body-parser'
 import sockjs from 'sockjs'
 import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
+import axios from 'axios'
 
 import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
+
+const { readFile, writeFile, unlink } = require('fs').promises
+
+const data = require('./data')
 
 const Root = () => ''
 
@@ -17,19 +22,29 @@ try {
   // ;(async () => {
   //   const items = await import('../dist/assets/js/root.bundle')
   //   console.log(JSON.stringify(items))
-
   //   Root = (props) => <items.Root {...props} />
   //   console.log(JSON.stringify(items.Root))
   // })()
-  console.log(Root)
+  // console.log(Root)
 } catch (ex) {
-  console.log(' run yarn build:prod to enable ssr')
+  // console.log(' run yarn build:prod to enable ssr')
 }
 
 let connections = []
 
 const port = process.env.PORT || 8090
 const server = express()
+
+const readLogs = async () => {
+  const result = readFile(`${__dirname}/logs.json`, { encoding: 'utf8' })
+    .then((list) => JSON.parse(list))
+    .catch(() => [])
+  return result
+}
+
+const saveLogs = async (list) => {
+  return writeFile(`${__dirname}/logs.json`, JSON.stringify(list), { encoding: 'utf8' })
+}
 
 const middleware = [
   cors(),
@@ -40,6 +55,34 @@ const middleware = [
 ]
 
 middleware.forEach((it) => server.use(it))
+
+server.get('/api/v1/products', (req, res) => {
+  res.json(data.slice(0, 15))
+})
+
+server.get('/api/v1/rates', async (req, res) => {
+  const { data: rates } = await axios('https://api.exchangeratesapi.io/latest?symbols=USD,CAD')
+  res.json(rates)
+})
+
+server.get('/api/v1/logs', async (req, res) => {
+  const logs = await readFile(`${__dirname}/logs.json`, { encoding: 'utf8' }).then((list) =>
+    JSON.parse(list)
+  )
+  res.json(logs)
+})
+
+server.post('/api/v1/logs', async (req, res) => {
+  const log = req.body
+  const logs = await readLogs()
+  await saveLogs([...logs, log])
+  res.json({ status: 'ok' })
+})
+
+server.delete('/api/v1/logs', (req, res) => {
+  unlink(`${__dirname}/logs.json`)
+  res.json('ok')
+})
 
 server.use('/api/', (req, res) => {
   res.status(404)
@@ -88,4 +131,4 @@ if (config.isSocketsEnabled) {
   })
   echo.installHandlers(app, { prefix: '/ws' })
 }
-console.log(`Serving at http://localhost:${port}`)
+// console.log(`Serving at http://localhost:${port}`)
