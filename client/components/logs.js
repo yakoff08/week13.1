@@ -16,7 +16,7 @@ const LOGS = () => {
   return (
     <div>
       <button
-        className="bg-gray-300 hover:bg-blue-200 text-gray-800 font-bold py-2 px-4 rounded-full"
+        className="bg-gray-300 hover:bg-blue-200 text-gray-800 font-bold py-2 px-4"
         type="button"
       >
         <Link to="/">Main</Link>

@@ -36,7 +36,7 @@ const Cards = () => {
               <div className="flex p-4 justify-between">
                 {' '}
                 <button
-                  className="bg-gray-300 hover:bg-blue-200 text-gray-800 font-bold py-0 px-4 rounded-full"
+                  className="bg-gray-300 hover:bg-blue-200 text-gray-800 font-bold px-4 rounded-full"
                   type="button"
                   onClick={() => dispatch(removeSelection(card.id))}
                 >

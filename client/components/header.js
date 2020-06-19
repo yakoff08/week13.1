@@ -73,12 +73,15 @@ const Header = () => {
             BY NAME
           </button>
         </div>
-        <button
-          type="button"
-          className="bg-gray-300 hover:bg-blue-200 text-gray-800 font-bold py-2 px-4 rounded-full"
-        >
-          <Link to="/shopping">Basket</Link>
-        </button>
+        <div>
+          <button
+            type="button"
+            className="bg-gray-300 hover:bg-blue-200 text-gray-800 font-bold py-2 px-4 rounded-full"
+          >
+            <Link to="/shopping">Basket</Link>
+          </button>
+        </div>
+
         <div>
           <div>SuM {sum !== 0 && sum.toFixed(2)}</div>
           <div>Value {numberOfItems !== 0 && numberOfItems}</div>
